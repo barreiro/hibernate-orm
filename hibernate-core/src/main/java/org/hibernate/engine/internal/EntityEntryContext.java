@@ -204,8 +204,14 @@ public class EntityEntryContext {
 			}
 		}
 
-		EntityEntry theEntityEntry = managedEntity.$$_hibernate_getEntityEntry();
-		managedEntity.$$_hibernate_setEntityEntry( null );
+		// finally clean out the ManagedEntity and return the associated EntityEntry
+		final EntityEntry theEntityEntry = managedEntity.$$_hibernate_getEntityEntry();
+
+		// don't set EntityEntry to null in enhanced entity if the Entity is Immutable
+		if(!(theEntityEntry.getStatus().equals(org.hibernate.engine.spi.Status.READ_ONLY))){
+			managedEntity.$$_hibernate_setEntityEntry( null );
+		}
+
 		return theEntityEntry;
 	}
 
@@ -233,7 +239,10 @@ public class EntityEntryContext {
 		while ( node != null ) {
 			final ManagedEntity nextNode = node.$$_hibernate_getNextManagedEntity();
 
-			node.$$_hibernate_setEntityEntry( null );
+			// don't set EntityEntry to null in enhanced entity if the Entity is Immutable
+			if(!(((EntityEntry)node.$$_hibernate_getEntityEntry()).getStatus().equals(org.hibernate.engine.spi.Status.READ_ONLY))){
+				node.$$_hibernate_setEntityEntry( null );
+			}
 			node.$$_hibernate_setPreviousManagedEntity( null );
 			node.$$_hibernate_setNextManagedEntity( null );
 
