@@ -17,11 +17,15 @@ import org.hibernate.EntityMode;
 import org.hibernate.EntityNameResolver;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.bytecode.enhance.spi.interceptor.LazyAttributeLoader;
 import org.hibernate.bytecode.instrumentation.internal.FieldInterceptionHelper;
 import org.hibernate.bytecode.instrumentation.spi.FieldInterceptor;
 import org.hibernate.bytecode.spi.ReflectionOptimizer;
 import org.hibernate.cfg.Environment;
 import org.hibernate.classic.Lifecycle;
+import org.hibernate.engine.spi.PersistentAttributeInterceptable;
+import org.hibernate.engine.spi.PersistentAttributeInterceptor;
+import org.hibernate.engine.spi.SelfDirtinessTracker;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CoreLogging;
@@ -283,11 +287,19 @@ public class PojoEntityTuplizer extends AbstractEntityTuplizer {
 			//TODO: if we support multiple fetch groups, we would need
 			//      to clone the set of lazy properties!
 			FieldInterceptionHelper.injectFieldInterceptor( entity, getEntityName(), lazyProps, session );
+		}
 
-			//also clear the fields that are marked as dirty in the dirtyness tracker
-			if ( entity instanceof org.hibernate.engine.spi.SelfDirtinessTracker ) {
-				( (org.hibernate.engine.spi.SelfDirtinessTracker) entity ).$$_hibernate_clearDirtyAttributes();
+		// new bytecode enhancement lazy interception
+		if ( entity instanceof PersistentAttributeInterceptable ) {
+			if ( lazyPropertiesAreUnfetched && getEntityMetamodel().hasLazyProperties() ) {
+				PersistentAttributeInterceptor interceptor = new LazyAttributeLoader( session, lazyPropertyNames, getEntityName() );
+				( (PersistentAttributeInterceptable) entity ).$$_hibernate_setInterceptor( interceptor );
 			}
+		}
+
+		//also clear the fields that are marked as dirty in the dirtyness tracker
+		if ( entity instanceof SelfDirtinessTracker ) {
+			( (SelfDirtinessTracker) entity ).$$_hibernate_clearDirtyAttributes();
 		}
 	}
 
