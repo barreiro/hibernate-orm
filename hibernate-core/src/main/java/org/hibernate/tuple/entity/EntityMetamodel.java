@@ -24,6 +24,7 @@ import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.engine.OptimisticLockStyle;
 import org.hibernate.engine.spi.CascadeStyle;
 import org.hibernate.engine.spi.CascadeStyles;
+import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.ValueInclusion;
 import org.hibernate.internal.CoreMessageLogger;
@@ -124,6 +125,7 @@ public class EntityMetamodel implements Serializable {
 	private final EntityMode entityMode;
 	private final EntityTuplizer entityTuplizer;
 	private final EntityInstrumentationMetadata instrumentationMetadata;
+	private final boolean lazyLoadingBytecodeEnhanced;
 
 	public EntityMetamodel(
 			PersistentClass persistentClass,
@@ -142,6 +144,9 @@ public class EntityMetamodel implements Serializable {
 		);
 
 		versioned = persistentClass.isVersioned();
+
+		lazyLoadingBytecodeEnhanced = ( persistentClass.getMappedClass() != null
+				&& PersistentAttributeInterceptable.class.isAssignableFrom( persistentClass.getMappedClass() ) );
 
 		instrumentationMetadata = persistentClass.hasPojoRepresentation()
 				? Environment.getBytecodeProvider().getEntityInstrumentationMetadata( persistentClass.getMappedClass() )
@@ -221,7 +226,7 @@ public class EntityMetamodel implements Serializable {
 			}
 
 			// temporary ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			boolean lazy = prop.isLazy() && instrumentationMetadata.isInstrumented();
+			boolean lazy = prop.isLazy() && ( lazyLoadingBytecodeEnhanced || instrumentationMetadata.isInstrumented() );
 			if ( lazy ) {
 				hasLazy = true;
 			}
@@ -1092,6 +1097,10 @@ public class EntityMetamodel implements Serializable {
 	 */
 	public boolean isInstrumented() {
 		return instrumentationMetadata.isInstrumented();
+	}
+
+	public boolean isLazyLoadingBytecodeEnhanced() {
+		return this.lazyLoadingBytecodeEnhanced;
 	}
 
 	public EntityInstrumentationMetadata getInstrumentationMetadata() {
