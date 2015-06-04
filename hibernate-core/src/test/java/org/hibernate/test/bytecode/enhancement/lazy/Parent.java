@@ -6,7 +6,6 @@
  */
 package org.hibernate.test.bytecode.enhancement.lazy;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -27,7 +26,7 @@ public class Parent {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<Child> children;
 
 	public Long getId() {
@@ -44,17 +43,6 @@ public class Parent {
 
 	public void setChildren(List<Child> children) {
 		this.children = children;
-	}
-
-	Child makeChild() {
-		List<Child> children = ( this.children == null ? new ArrayList<Child>() : this.children );
-
-		final Child c = new Child();
-		c.setParent( this );
-		children.add( c );
-
-		this.children = children;
-		return c;
 	}
 
 }

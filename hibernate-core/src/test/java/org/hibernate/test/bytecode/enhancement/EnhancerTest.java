@@ -12,6 +12,7 @@ import org.hibernate.test.bytecode.enhancement.association.OneToManyAssociationT
 import org.hibernate.test.bytecode.enhancement.association.OneToOneAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.basic.BasicEnhancementTestTask;
 import org.hibernate.test.bytecode.enhancement.dirty.DirtyTrackingTestTask;
+import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingIntegrationTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingTestTask;
 import org.junit.Test;
 
@@ -40,6 +41,7 @@ public class EnhancerTest extends BaseUnitTestCase {
 	@Test
 	public void testLazy() {
 		EnhancerTestUtils.runEnhancerTestTask( LazyLoadingTestTask.class );
+		EnhancerTestUtils.runEnhancerTestTask( LazyLoadingIntegrationTestTask.class );
 	}
 
 }

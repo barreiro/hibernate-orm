@@ -7,6 +7,7 @@
 package org.hibernate.test.bytecode.enhancement.association;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.test.bytecode.enhancement.AbstractEnhancerTestTask;
 import org.junit.Assert;
@@ -35,10 +36,25 @@ public class ManyToManyAssociationTestTask extends AbstractEnhancerTestTask {
 		anotherUser.addGroup( group );
 
 		Assert.assertTrue( group.getUsers().size() == 2 );
+		Assert.assertTrue( anotherGroup.getUsers().size() == 1 );
 
 		group.setUsers( new HashSet<User>() );
 
 		Assert.assertTrue( user.getGroups().size() == 1 );
+
+		// Test remove
+		Set<Group> groups = new HashSet<Group>( user.getGroups() );
+		groups.remove( group );
+		user.setGroups( groups );
+
+		Assert.assertTrue( group.getUsers().size() == 1 );
+		Assert.assertTrue( anotherGroup.getUsers().size() == 1 );
+
+		groups.remove( anotherGroup );
+		user.setGroups( groups );
+
+		Assert.assertTrue( group.getUsers().size() == 1 );
+		Assert.assertTrue( anotherGroup.getUsers().isEmpty() );
 	}
 
 	protected void cleanup() {

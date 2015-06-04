@@ -72,6 +72,10 @@ public class Customer {
 		return customerInventories;
 	}
 
+	public void setInventories (List<CustomerInventory> inventories) {
+		this.customerInventories = inventories;
+	}
+
 	public User getUser() {
 		return user;
 	}

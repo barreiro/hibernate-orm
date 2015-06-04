@@ -6,6 +6,8 @@
  */
 package org.hibernate.test.bytecode.enhancement.association;
 
+import java.util.List;
+
 import org.hibernate.test.bytecode.enhancement.AbstractEnhancerTestTask;
 import org.junit.Assert;
 
@@ -47,6 +49,15 @@ public class OneToManyAssociationTestTask extends AbstractEnhancerTestTask {
 
 		customer.addInventory( new CustomerInventory() );
 		Assert.assertTrue( customer.getInventories().size() == 2 );
+
+		// Test remove
+
+		List<CustomerInventory> inventories = customer.getInventories();
+		inventories.remove( customerInventory );
+		customer.setInventories( inventories );
+
+		// This happens (and is expected) because there was no snapshot taken before remove
+		Assert.assertNotNull( customerInventory.getCustomer() );
 	}
 
 	protected void cleanup() {

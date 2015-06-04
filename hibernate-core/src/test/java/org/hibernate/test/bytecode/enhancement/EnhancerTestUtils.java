@@ -10,6 +10,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Set;
 import javax.persistence.Embeddable;
@@ -155,6 +159,11 @@ public abstract class EnhancerTestUtils extends BaseUnitTestCase {
 					final Class p = getParent().loadClass( name );
 					if ( p.getAnnotation( Entity.class ) != null || p.getAnnotation( Embeddable.class ) != null ) {
 						final byte[] enhanced = new Enhancer( enhancementContext ).enhance( name, original );
+
+						Path debugOutput = Paths.get( workingDir + File.separator + getFilenameForClassName( name ) );
+						Files.createDirectories( debugOutput.getParent() );
+						Files.write( debugOutput, enhanced, StandardOpenOption.CREATE );
+
 						return defineClass( name, enhanced, 0, enhanced.length );
 					}
 					else {

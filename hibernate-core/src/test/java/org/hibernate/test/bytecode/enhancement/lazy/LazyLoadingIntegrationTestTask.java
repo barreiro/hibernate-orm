@@ -7,13 +7,11 @@
 package org.hibernate.test.bytecode.enhancement.lazy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.proxy.HibernateProxy;
 
 import org.hibernate.test.bytecode.enhancement.AbstractEnhancerTestTask;
 import org.hibernate.test.bytecode.enhancement.EnhancerTestUtils;
@@ -22,7 +20,7 @@ import org.junit.Assert;
 /**
  * @author Luis Barreiro
  */
-public class LazyLoadingTestTask extends AbstractEnhancerTestTask {
+public class LazyLoadingIntegrationTestTask extends AbstractEnhancerTestTask {
 
 	private static final int CHILDREN_SIZE = 10;
 	private Long parentID;
@@ -42,15 +40,14 @@ public class LazyLoadingTestTask extends AbstractEnhancerTestTask {
 		s.beginTransaction();
 
 		Parent parent = new Parent();
-		List<Child> children = new ArrayList<Child>( CHILDREN_SIZE );
+		parent.setChildren( new ArrayList<Child>( CHILDREN_SIZE ) );
 		for ( int i = 0; i < CHILDREN_SIZE; i++ ) {
 			final Child child = new Child();
+			// Association management should kick in here
 			child.setParent( parent );
-			children.add( child );
 			s.persist( child );
 			lastChildID = child.getId();
 		}
-		parent.setChildren( children );
 		s.persist( parent );
 		parentID = parent.getId();
 
@@ -64,28 +61,22 @@ public class LazyLoadingTestTask extends AbstractEnhancerTestTask {
 		s.beginTransaction();
 
 		Child loadedChild = s.load( Child.class, lastChildID );
+		EnhancerTestUtils.checkDirtyTracking( loadedChild );
 
-		Assert.assertNull( "Lazy field 'parent' is initialized", loadedChild.parent );
-		Assert.assertFalse( loadedChild instanceof HibernateProxy );
+		loadedChild.setName( "Barrabas" );
+		EnhancerTestUtils.checkDirtyTracking( loadedChild, "name" );
 
 		Parent loadedParent = loadedChild.getParent();
-
-		EnhancerTestUtils.checkDirtyTracking( loadedChild );
-
-		Assert.assertNotNull( "Lazy field 'parent' is not loaded", loadedChild.parent );
-		Assert.assertNull( "Lazy field 'children' is initialized", loadedParent.children );
-		Assert.assertFalse( loadedParent instanceof HibernateProxy );
-		Assert.assertTrue( parentID.equals( loadedParent.id ) );
-
-		Collection<Child> loadedChildren = loadedParent.getChildren();
-
-		EnhancerTestUtils.checkDirtyTracking( loadedChild );
+		EnhancerTestUtils.checkDirtyTracking( loadedChild, "name" );
 		EnhancerTestUtils.checkDirtyTracking( loadedParent );
 
-		Assert.assertNotNull( "Lazy field 'children' is not loaded", loadedParent.children );
-		Assert.assertFalse( loadedChildren instanceof HibernateProxy );
-		Assert.assertEquals( CHILDREN_SIZE, loadedChildren.size() );
-		Assert.assertTrue( loadedChildren.contains( loadedChild ) );
+		List<Child> loadedChildren = new ArrayList<Child>( loadedParent.getChildren() );
+		loadedChildren.remove( 0 );
+		loadedChildren.remove( loadedChild );
+		loadedParent.setChildren( loadedChildren );
+
+		EnhancerTestUtils.checkDirtyTracking( loadedParent );
+		Assert.assertNull( loadedChild.parent );
 
 		s.getTransaction().commit();
 		s.close();
