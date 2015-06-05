@@ -8,6 +8,7 @@ package org.hibernate.tuple.entity;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class PojoEntityTuplizer extends AbstractEntityTuplizer {
 	private final Class mappedClass;
 	private final Class proxyInterface;
 	private final boolean lifecycleImplementor;
-	private final Set<String> lazyPropertyNames = new HashSet<String>();
+	private final Set<String> lazyPropertyNames;
 	private final ReflectionOptimizer optimizer;
 	private final boolean isInstrumented;
 
@@ -66,12 +67,14 @@ public class PojoEntityTuplizer extends AbstractEntityTuplizer {
 		this.isInstrumented = entityMetamodel.isInstrumented();
 
 		Iterator iter = mappedEntity.getPropertyClosureIterator();
+		Set<String> lazyProperties = new HashSet<String>();
 		while ( iter.hasNext() ) {
 			Property property = (Property) iter.next();
 			if ( property.isLazy() ) {
-				lazyPropertyNames.add( property.getName() );
+				lazyProperties.add( property.getName() );
 			}
 		}
+		this.lazyPropertyNames = Collections.unmodifiableSet( lazyProperties );
 
 		String[] getterNames = new String[propertySpan];
 		String[] setterNames = new String[propertySpan];
@@ -292,7 +295,8 @@ public class PojoEntityTuplizer extends AbstractEntityTuplizer {
 		// new bytecode enhancement lazy interception
 		if ( entity instanceof PersistentAttributeInterceptable ) {
 			if ( lazyPropertiesAreUnfetched && getEntityMetamodel().hasLazyProperties() ) {
-				PersistentAttributeInterceptor interceptor = new LazyAttributeLoader( session, lazyPropertyNames, getEntityName() );
+				Set<String> uninitialized = new HashSet<String>( lazyPropertyNames );
+				PersistentAttributeInterceptor interceptor = new LazyAttributeLoader( session, uninitialized, getEntityName() );
 				( (PersistentAttributeInterceptable) entity ).$$_hibernate_setInterceptor( interceptor );
 			}
 		}
