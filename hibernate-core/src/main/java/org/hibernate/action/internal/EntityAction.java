@@ -174,7 +174,7 @@ public abstract class EntityAction
 		}
 	}
 
-	protected <T> EventListenerGroup<T> listenerGroup(EventType<T> eventType) {
+	protected <T> EventListenerGroup<T> listenerGroup(EventType eventType) {
 		return getSession()
 				.getFactory()
 				.getServiceRegistry()

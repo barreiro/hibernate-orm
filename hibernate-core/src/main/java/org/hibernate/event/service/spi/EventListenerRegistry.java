@@ -18,16 +18,17 @@ import org.hibernate.service.Service;
  * @author Steve Ebersole
  */
 public interface EventListenerRegistry extends Service, Serializable {
-	public <T> EventListenerGroup<T> getEventListenerGroup(EventType<T> eventType);
+	public <T> EventListenerGroup<T> getEventListenerGroup(EventType eventType);
+	public <T> EventListenerGroup<T> getEventListenerGroup(EventType eventType, Class<? extends T> ... listeners);
 
 	public void addDuplicationStrategy(DuplicationStrategy strategy);
 
-	public <T> void setListeners(EventType<T> type, Class<? extends T>... listeners);
-	public <T> void setListeners(EventType<T> type, T... listeners);
+	public <T> void setListeners(EventType type, Class<? extends T>... listeners);
+	public <T> void setListeners(EventType type, T... listeners);
 
-	public <T> void appendListeners(EventType<T> type, Class<? extends T>... listeners);
-	public <T> void appendListeners(EventType<T> type, T... listeners);
+	public <T> void appendListeners(EventType type, Class<? extends T>... listeners);
+	public <T> void appendListeners(EventType type, T... listeners);
 
-	public <T> void prependListeners(EventType<T> type, Class<? extends T>... listeners);
-	public <T> void prependListeners(EventType<T> type, T... listeners);
+	public <T> void prependListeners(EventType type, Class<? extends T>... listeners);
+	public <T> void prependListeners(EventType type, T... listeners);
 }

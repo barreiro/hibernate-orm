@@ -8,6 +8,7 @@ package org.hibernate.event.service.internal;
 
 import java.lang.reflect.Array;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,7 +84,16 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 	private Map<EventType,EventListenerGroupImpl> registeredEventListenersMap = prepareListenerMap();
 
 	@SuppressWarnings({ "unchecked" })
-	public <T> EventListenerGroupImpl<T> getEventListenerGroup(EventType<T> eventType) {
+	public <T> EventListenerGroupImpl<T> getEventListenerGroup(EventType eventType) {
+		EventListenerGroupImpl<T> listeners = registeredEventListenersMap.get( eventType );
+		if ( listeners == null ) {
+			throw new HibernateException( "Unable to find listeners for type [" + eventType.eventName() + "]" );
+		}
+		return listeners;
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public <T> EventListenerGroupImpl<T> getEventListenerGroup(EventType eventType, Class<? extends T>... listenerClasses) {
 		EventListenerGroupImpl<T> listeners = registeredEventListenersMap.get( eventType );
 		if ( listeners == null ) {
 			throw new HibernateException( "Unable to find listeners for type [" + eventType.eventName() + "]" );
@@ -99,12 +109,12 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 	}
 
 	@Override
-	public <T> void setListeners(EventType<T> type, Class<? extends T>... listenerClasses) {
+	public <T> void setListeners(EventType type, Class<? extends T>... listenerClasses) {
 		setListeners( type, resolveListenerInstances( type, listenerClasses ) );
 	}
 
 	@SuppressWarnings( {"unchecked"})
-	private <T> T[] resolveListenerInstances(EventType<T> type, Class<? extends T>... listenerClasses) {
+	private <T> T[] resolveListenerInstances(EventType type, Class<? extends T>... listenerClasses) {
 		T[] listeners = (T[]) Array.newInstance( type.baseListenerInterface(), listenerClasses.length );
 		for ( int i = 0; i < listenerClasses.length; i++ ) {
 			listeners[i] = resolveListenerInstance( listenerClasses[i] );
@@ -135,7 +145,7 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 	}
 
 	@Override
-	public <T> void setListeners(EventType<T> type, T... listeners) {
+	public <T> void setListeners(EventType type, T... listeners) {
 		EventListenerGroupImpl<T> registeredListeners = getEventListenerGroup( type );
 		registeredListeners.clear();
 		if ( listeners != null ) {
@@ -146,27 +156,27 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 	}
 
 	@Override
-	public <T> void appendListeners(EventType<T> type, Class<? extends T>... listenerClasses) {
+	public <T> void appendListeners(EventType type, Class<? extends T>... listenerClasses) {
 		appendListeners( type, resolveListenerInstances( type, listenerClasses ) );
 	}
 
 	@Override
-	public <T> void appendListeners(EventType<T> type, T... listeners) {
+	public <T> void appendListeners(EventType type, T... listeners) {
 		getEventListenerGroup( type ).appendListeners( listeners );
 	}
 
 	@Override
-	public <T> void prependListeners(EventType<T> type, Class<? extends T>... listenerClasses) {
+	public <T> void prependListeners(EventType type, Class<? extends T>... listenerClasses) {
 		prependListeners( type, resolveListenerInstances( type, listenerClasses ) );
 	}
 
 	@Override
-	public <T> void prependListeners(EventType<T> type, T... listeners) {
+	public <T> void prependListeners(EventType type, T... listeners) {
 		getEventListenerGroup( type ).prependListeners( listeners );
 	}
 
 	private static Map<EventType,EventListenerGroupImpl> prepareListenerMap() {
-		final Map<EventType,EventListenerGroupImpl> workMap = new HashMap<EventType, EventListenerGroupImpl>();
+		final Map<EventType,EventListenerGroupImpl> workMap = new EnumMap<EventType, EventListenerGroupImpl>( EventType.class );
 
 		// auto-flush listeners
 		prepareListeners(
@@ -406,11 +416,11 @@ public class EventListenerRegistryImpl implements EventListenerRegistry {
 		return Collections.unmodifiableMap( workMap );
 	}
 
-	private static <T> void prepareListeners(EventType<T> type, Map<EventType,EventListenerGroupImpl> map) {
+	private static <T> void prepareListeners(EventType type, Map<EventType,EventListenerGroupImpl> map) {
 		prepareListeners( type, null, map );
 	}
 
-	private static <T> void prepareListeners(EventType<T> type, T defaultListener, Map<EventType,EventListenerGroupImpl> map) {
+	private static <T> void prepareListeners(EventType type, T defaultListener, Map<EventType,EventListenerGroupImpl> map) {
 		final EventListenerGroupImpl<T> listenerGroup;
 		if ( type == EventType.POST_COMMIT_DELETE
 				|| type == EventType.POST_COMMIT_INSERT

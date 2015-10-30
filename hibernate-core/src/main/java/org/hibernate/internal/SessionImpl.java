@@ -392,7 +392,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		actionQueue.clear();
 
 		final ClearEvent event = new ClearEvent( this );
-		for ( ClearEventListener listener : listeners( EventType.CLEAR ) ) {
+		for ( ClearEventListener listener : listeners( EventType.CLEAR, ClearEventListener.class ) ) {
 			listener.onClear( event );
 		}
 	}
@@ -643,17 +643,17 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( SaveOrUpdateEventListener listener : listeners( EventType.SAVE_UPDATE ) ) {
+		for ( SaveOrUpdateEventListener listener : listeners( EventType.SAVE_UPDATE, SaveOrUpdateEventListener.class ) ) {
 			listener.onSaveOrUpdate( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
 	}
 
-	private <T> Iterable<T> listeners(EventType<T> type) {
-		return eventListenerGroup( type ).listeners();
+	private <T> Iterable<T> listeners(EventType type, Class<? extends T> implType) {
+		return (Iterable<T>) eventListenerGroup( type ).listeners();
 	}
 
-	private <T> EventListenerGroup<T> eventListenerGroup(EventType<T> type) {
+	private <T> EventListenerGroup<T> eventListenerGroup(EventType type) {
 		return factory.getServiceRegistry().getService( EventListenerRegistry.class ).getEventListenerGroup( type );
 	}
 
@@ -674,7 +674,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( SaveOrUpdateEventListener listener : listeners( EventType.SAVE ) ) {
+		for ( SaveOrUpdateEventListener listener : listeners( EventType.SAVE, SaveOrUpdateEventListener.class ) ) {
 			listener.onSaveOrUpdate( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
@@ -698,7 +698,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( SaveOrUpdateEventListener listener : listeners( EventType.UPDATE ) ) {
+		for ( SaveOrUpdateEventListener listener : listeners( EventType.UPDATE, SaveOrUpdateEventListener.class ) ) {
 			listener.onSaveOrUpdate( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
@@ -733,7 +733,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireLock(LockEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( LockEventListener listener : listeners( EventType.LOCK ) ) {
+		for ( LockEventListener listener : listeners( EventType.LOCK, LockEventListener.class ) ) {
 			listener.onLock( event );
 		}
 		delayedAfterCompletion();
@@ -760,7 +760,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void firePersist(Map copiedAlready, PersistEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( PersistEventListener listener : listeners( EventType.PERSIST ) ) {
+		for ( PersistEventListener listener : listeners( EventType.PERSIST, PersistEventListener.class ) ) {
 			listener.onPersist( event, copiedAlready );
 		}
 		delayedAfterCompletion();
@@ -770,7 +770,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( PersistEventListener listener : listeners( EventType.PERSIST ) ) {
+		for ( PersistEventListener listener : listeners( EventType.PERSIST, PersistEventListener.class ) ) {
 			listener.onPersist( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
@@ -797,7 +797,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void firePersistOnFlush(Map copiedAlready, PersistEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( PersistEventListener listener : listeners( EventType.PERSIST_ONFLUSH ) ) {
+		for ( PersistEventListener listener : listeners( EventType.PERSIST_ONFLUSH, PersistEventListener.class ) ) {
 			listener.onPersist( event, copiedAlready );
 		}
 		delayedAfterCompletion();
@@ -807,7 +807,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( PersistEventListener listener : listeners( EventType.PERSIST_ONFLUSH ) ) {
+		for ( PersistEventListener listener : listeners( EventType.PERSIST_ONFLUSH, PersistEventListener.class ) ) {
 			listener.onPersist( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
@@ -835,7 +835,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		checkNoUnresolvedActionsBeforeOperation();
-		for ( MergeEventListener listener : listeners( EventType.MERGE ) ) {
+		for ( MergeEventListener listener : listeners( EventType.MERGE, MergeEventListener.class ) ) {
 			listener.onMerge( event );
 		}
 		checkNoUnresolvedActionsAfterOperation();
@@ -845,7 +845,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireMerge(Map copiedAlready, MergeEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( MergeEventListener listener : listeners( EventType.MERGE ) ) {
+		for ( MergeEventListener listener : listeners( EventType.MERGE, MergeEventListener.class ) ) {
 			listener.onMerge( event, copiedAlready );
 		}
 		delayedAfterCompletion();
@@ -916,7 +916,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireDelete(DeleteEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( DeleteEventListener listener : listeners( EventType.DELETE ) ) {
+		for ( DeleteEventListener listener : listeners( EventType.DELETE, DeleteEventListener.class ) ) {
 			listener.onDelete( event );
 		}
 		delayedAfterCompletion();
@@ -925,7 +925,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireDelete(DeleteEvent event, Set transientEntities) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( DeleteEventListener listener : listeners( EventType.DELETE ) ) {
+		for ( DeleteEventListener listener : listeners( EventType.DELETE, DeleteEventListener.class ) ) {
 			listener.onDelete( event, transientEntities );
 		}
 		delayedAfterCompletion();
@@ -1067,7 +1067,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireLoad(LoadEvent event, LoadType loadType) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( LoadEventListener listener : listeners( EventType.LOAD ) ) {
+		for ( LoadEventListener listener : listeners( EventType.LOAD, LoadEventListener.class ) ) {
 			listener.onLoad( event, loadType );
 		}
 		delayedAfterCompletion();
@@ -1076,7 +1076,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireResolveNaturalId(ResolveNaturalIdEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( ResolveNaturalIdEventListener listener : listeners( EventType.RESOLVE_NATURAL_ID ) ) {
+		for ( ResolveNaturalIdEventListener listener : listeners( EventType.RESOLVE_NATURAL_ID, ResolveNaturalIdEventListener.class ) ) {
 			listener.onResolveNaturalId( event );
 		}
 		delayedAfterCompletion();
@@ -1118,7 +1118,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireRefresh(RefreshEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( RefreshEventListener listener : listeners( EventType.REFRESH ) ) {
+		for ( RefreshEventListener listener : listeners( EventType.REFRESH, RefreshEventListener.class ) ) {
 			listener.onRefresh( event );
 		}
 		delayedAfterCompletion();
@@ -1127,7 +1127,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireRefresh(Map refreshedAlready, RefreshEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( RefreshEventListener listener : listeners( EventType.REFRESH ) ) {
+		for ( RefreshEventListener listener : listeners( EventType.REFRESH, RefreshEventListener.class ) ) {
 			listener.onRefresh( event, refreshedAlready );
 		}
 		delayedAfterCompletion();
@@ -1150,7 +1150,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireReplicate(ReplicateEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( ReplicateEventListener listener : listeners( EventType.REPLICATE ) ) {
+		for ( ReplicateEventListener listener : listeners( EventType.REPLICATE, ReplicateEventListener.class ) ) {
 			listener.onReplicate( event );
 		}
 		delayedAfterCompletion();
@@ -1171,7 +1171,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 	private void fireEvict(EvictEvent event) {
 		errorIfClosed();
 		checkTransactionSynchStatus();
-		for ( EvictEventListener listener : listeners( EventType.EVICT ) ) {
+		for ( EvictEventListener listener : listeners( EventType.EVICT, EvictEventListener.class ) ) {
 			listener.onEvict( event );
 		}
 		delayedAfterCompletion();
@@ -1188,8 +1188,8 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 			return false;
 		}
 		AutoFlushEvent event = new AutoFlushEvent( querySpaces, this );
-		listeners( EventType.AUTO_FLUSH );
-		for ( AutoFlushEventListener listener : listeners( EventType.AUTO_FLUSH ) ) {
+		//listeners( EventType.AUTO_FLUSH );
+		for ( AutoFlushEventListener listener : listeners( EventType.AUTO_FLUSH, AutoFlushEventListener.class ) ) {
 			listener.onAutoFlush( event );
 		}
 		return event.isFlushRequired();
@@ -1205,7 +1205,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 			return true;
 		}
 		DirtyCheckEvent event = new DirtyCheckEvent( this );
-		for ( DirtyCheckEventListener listener : listeners( EventType.DIRTY_CHECK ) ) {
+		for ( DirtyCheckEventListener listener : listeners( EventType.DIRTY_CHECK, DirtyCheckEventListener.class ) ) {
 			listener.onDirtyCheck( event );
 		}
 		delayedAfterCompletion();
@@ -1220,7 +1220,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 			throw new HibernateException( "Flush during cascade is dangerous" );
 		}
 		FlushEvent flushEvent = new FlushEvent( this );
-		for ( FlushEventListener listener : listeners( EventType.FLUSH ) ) {
+		for ( FlushEventListener listener : listeners( EventType.FLUSH, FlushEventListener.class ) ) {
 			listener.onFlush( flushEvent );
 		}
 		delayedAfterCompletion();
@@ -1929,7 +1929,7 @@ public final class SessionImpl extends AbstractSessionImpl implements EventSourc
 		errorIfClosed();
 		checkTransactionSynchStatus();
 		InitializeCollectionEvent event = new InitializeCollectionEvent( collection, this );
-		for ( InitializeCollectionEventListener listener : listeners( EventType.INIT_COLLECTION ) ) {
+		for ( InitializeCollectionEventListener listener : listeners( EventType.INIT_COLLECTION, InitializeCollectionEventListener.class ) ) {
 			listener.onInitializeCollection( event );
 		}
 		delayedAfterCompletion();

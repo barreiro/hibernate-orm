@@ -184,7 +184,7 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		}
 	}
 
-	protected <T> EventListenerGroup<T> listenerGroup(EventType<T> eventType) {
+	protected <T> EventListenerGroup<T> listenerGroup(EventType eventType) {
 		return getSession()
 				.getFactory()
 				.getServiceRegistry()

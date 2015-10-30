@@ -22,7 +22,7 @@ public interface EventListenerGroup<T> extends Serializable {
 	 *
 	 * @return The event type.
 	 */
-	public EventType<T> getEventType();
+	public EventType getEventType();
 
 	/**
 	 * Are there no listeners registered?

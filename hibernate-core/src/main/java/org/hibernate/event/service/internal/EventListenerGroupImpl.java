@@ -22,12 +22,12 @@ import org.hibernate.event.spi.EventType;
  * @author Steve Ebersole
  */
 public class EventListenerGroupImpl<T> implements EventListenerGroup<T> {
-	private EventType<T> eventType;
+	private EventType eventType;
 
 	private final Set<DuplicationStrategy> duplicationStrategies = new LinkedHashSet<DuplicationStrategy>();
 	private List<T> listeners;
 
-	public EventListenerGroupImpl(EventType<T> eventType) {
+	public EventListenerGroupImpl(EventType eventType) {
 		this.eventType = eventType;
 		duplicationStrategies.add(
 				// At minimum make sure we do not register the same exact listener class multiple times.
@@ -46,7 +46,7 @@ public class EventListenerGroupImpl<T> implements EventListenerGroup<T> {
 	}
 
 	@Override
-	public EventType<T> getEventType() {
+	public EventType getEventType() {
 		return eventType;
 	}
 

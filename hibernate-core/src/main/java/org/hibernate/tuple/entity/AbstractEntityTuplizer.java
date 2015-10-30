@@ -439,7 +439,7 @@ public abstract class AbstractEntityTuplizer implements EntityTuplizer {
 				.getFactory()
 				.getServiceRegistry()
 				.getService( EventListenerRegistry.class )
-				.getEventListenerGroup( EventType.PERSIST )
+				.getEventListenerGroup( EventType.PERSIST, PersistEventListener.class )
 				.listeners();
 	}
 

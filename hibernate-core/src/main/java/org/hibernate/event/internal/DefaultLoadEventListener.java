@@ -848,7 +848,7 @@ public class DefaultLoadEventListener extends AbstractLockUpgradeEventListener i
 				.getFactory()
 				.getServiceRegistry()
 				.getService( EventListenerRegistry.class )
-				.getEventListenerGroup( EventType.POST_LOAD )
+				.getEventListenerGroup( EventType.POST_LOAD, PostLoadEventListener.class )
 				.listeners();
 	}
 }

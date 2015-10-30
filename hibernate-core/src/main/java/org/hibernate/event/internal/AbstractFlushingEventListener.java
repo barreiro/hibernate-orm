@@ -191,7 +191,7 @@ public abstract class AbstractFlushingEventListener implements Serializable {
 		final EventSource source = event.getSession();
 		final Iterable<FlushEntityEventListener> flushListeners = source.getFactory().getServiceRegistry()
 				.getService( EventListenerRegistry.class )
-				.getEventListenerGroup( EventType.FLUSH_ENTITY )
+				.getEventListenerGroup( EventType.FLUSH_ENTITY, FlushEntityEventListener.class )
 				.listeners();
 
 		// Among other things, updateReachables() will recursively load all
