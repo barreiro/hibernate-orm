@@ -131,13 +131,14 @@ public class EventType<T> {
 		return EVENT_TYPE_BY_NAME_MAP.values();
 	}
 
-
 	private final String eventName;
 	private final Class<? extends T> baseListenerInterface;
+	private final int hashCode;
 
 	private EventType(String eventName, Class<? extends T> baseListenerInterface) {
 		this.eventName = eventName;
 		this.baseListenerInterface = baseListenerInterface;
+		this.hashCode = System.identityHashCode( this );
 	}
 
 	public String eventName() {
@@ -146,6 +147,12 @@ public class EventType<T> {
 
 	public Class baseListenerInterface() {
 		return baseListenerInterface;
+	}
+
+	@Override
+	public int hashCode() {
+		// we do cache the hash. equals() is inherited from Object.class (==)
+		return hashCode;
 	}
 
 	@Override
