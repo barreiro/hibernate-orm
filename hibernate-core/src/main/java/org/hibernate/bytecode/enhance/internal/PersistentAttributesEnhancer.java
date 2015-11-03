@@ -421,7 +421,7 @@ public class PersistentAttributesEnhancer extends Enhancer {
 		}
 
 		// make sure to add the CompositeOwner interface
-		managedCtClass.addInterface( classPool.get( CompositeOwner.class.getName() ) );
+		managedCtClass.addInterface( loadCtClassFromClass( CompositeOwner.class ) );
 
 		if ( enhancementContext.isCompositeClass( managedCtClass ) ) {
 			// if a composite have a embedded field we need to implement the TRACKER_CHANGER_NAME method as well
@@ -501,7 +501,7 @@ public class PersistentAttributesEnhancer extends Enhancer {
 						itr.write16bit( methodIndex, index + 1 );
 					}
 				}
-				methodInfo.getCodeAttribute().setAttribute( MapMaker.make( classPool, methodInfo ) );
+				methodInfo.getCodeAttribute().setAttribute( MapMaker.make( managedCtClass.getClassPool(), methodInfo ) );
 			}
 			catch (BadBytecode bb) {
 				final String msg = String.format(
@@ -559,7 +559,7 @@ public class PersistentAttributesEnhancer extends Enhancer {
 					}
 					String fieldName = constPool.getFieldrefName( itr.u16bitAt( index + 1 ) );
 					String fieldClassName = constPool.getClassInfo( constPool.getFieldrefClass( itr.u16bitAt( index + 1 ) ) );
-					CtClass targetCtClass = this.classPool.getCtClass( fieldClassName );
+					CtClass targetCtClass = managedCtClass.getClassPool().getCtClass( fieldClassName );
 
 					if ( !enhancementContext.isEntityClass( targetCtClass ) && !enhancementContext.isCompositeClass( targetCtClass ) ) {
 						continue;
@@ -593,7 +593,7 @@ public class PersistentAttributesEnhancer extends Enhancer {
 					}
 
 				}
-				methodInfo.getCodeAttribute().setAttribute( MapMaker.make( classPool, methodInfo ) );
+				methodInfo.getCodeAttribute().setAttribute( MapMaker.make( managedCtClass.getClassPool(), methodInfo ) );
 			}
 			catch (BadBytecode bb) {
 				final String msg = String.format(
