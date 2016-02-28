@@ -31,50 +31,45 @@ public class EnhancedGetterMethodImpl implements Getter {
 
 	private final Class containerClass;
 	private final String propertyName;
-	private final Field field;
 	private final Method getterMethod;
 
 	public EnhancedGetterMethodImpl(
 			Class containerClass,
 			String propertyName,
-			Field field,
 			Method getterMethod) {
 		this.containerClass = containerClass;
 		this.propertyName = propertyName;
-		this.field = field;
 		this.getterMethod = getterMethod;
 	}
 
-//	private boolean isAttributeLoaded(Object owner) {
-//		if ( owner instanceof PersistentAttributeInterceptable ) {
-//			PersistentAttributeInterceptor interceptor = ( (PersistentAttributeInterceptable) owner ).$$_hibernate_getInterceptor();
-//			if ( interceptor != null && interceptor instanceof LazyAttributeLoadingInterceptor ) {
-//				return ( (LazyAttributeLoadingInterceptor) interceptor ).isAttributeLoaded( propertyName );
-//			}
-//		}
-//		return true;
-//	}
+	private boolean isAttributeLoaded(Object owner) {
+		if ( owner instanceof PersistentAttributeInterceptable ) {
+			PersistentAttributeInterceptor interceptor = ( (PersistentAttributeInterceptable) owner ).$$_hibernate_getInterceptor();
+			if ( interceptor != null && interceptor instanceof LazyAttributeLoadingInterceptor ) {
+				return ( (LazyAttributeLoadingInterceptor) interceptor ).isAttributeLoaded( propertyName );
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public Object get(Object owner) {
 		try {
-			return field.get( owner );
-
-//			// We don't want to trigger lazy loading of byte code enhanced attributes
-//			if ( isAttributeLoaded( owner ) ) {
-//				return getterMethod.invoke( owner );
-//			}
-//			return null;
+			// We don't want to trigger lazy loading of byte code enhanced attributes
+			if ( isAttributeLoaded( owner ) ) {
+				return getterMethod.invoke( owner );
+			}
+			return null;
 		}
-//		catch (InvocationTargetException ite) {
-//			throw new PropertyAccessException(
-//					ite,
-//					"Exception occurred inside",
-//					false,
-//					containerClass,
-//					propertyName
-//			);
-//		}
+		catch (InvocationTargetException ite) {
+			throw new PropertyAccessException(
+					ite,
+					"Exception occurred inside",
+					false,
+					containerClass,
+					propertyName
+			);
+		}
 		catch (IllegalAccessException iae) {
 			throw new PropertyAccessException(
 					iae,
@@ -141,7 +136,7 @@ public class EnhancedGetterMethodImpl implements Getter {
 		}
 
 		private Object readResolve() {
-			return new EnhancedGetterMethodImpl( containerClass, propertyName, resolveField(), resolveMethod() );
+			return new EnhancedGetterMethodImpl( containerClass, propertyName, resolveMethod() );
 		}
 
 		@SuppressWarnings("unchecked")
@@ -152,18 +147,6 @@ public class EnhancedGetterMethodImpl implements Getter {
 			catch (NoSuchMethodException e) {
 				throw new PropertyAccessSerializationException(
 						"Unable to resolve getter method on deserialization : " + declaringClass.getName() + "#" + methodName
-				);
-			}
-		}
-
-		@SuppressWarnings("unchecked")
-		private Field resolveField() {
-			try {
-				return declaringClass.getDeclaredField( propertyName );
-			}
-			catch (NoSuchFieldException e) {
-				throw new PropertyAccessSerializationException(
-						"Unable to resolve field on deserialization : " + declaringClass.getName() + "#" + propertyName
 				);
 			}
 		}

@@ -27,8 +27,8 @@ import static org.hibernate.internal.CoreLogging.messageLogger;
  * @author Steve Ebersole
  * @author Luis Barreiro
  */
-public class EnhancedSetterImpl implements Setter {
-	private static final CoreMessageLogger LOG = messageLogger( EnhancedSetterImpl.class );
+public class EnhancedSetterMethodImpl implements Setter {
+	private static final CoreMessageLogger LOG = messageLogger( EnhancedSetterMethodImpl.class );
 
 	private final Class containerClass;
 	private final String propertyName;
@@ -36,7 +36,7 @@ public class EnhancedSetterImpl implements Setter {
 
 	private final boolean isPrimitive;
 
-	public EnhancedSetterImpl(Class containerClass, String propertyName, Method setterMethod) {
+	public EnhancedSetterMethodImpl(Class containerClass, String propertyName, Method setterMethod) {
 		this.containerClass = containerClass;
 		this.propertyName = propertyName;
 		this.setterMethod = setterMethod;
@@ -158,7 +158,7 @@ public class EnhancedSetterImpl implements Setter {
 		}
 
 		private Object readResolve() {
-			return new EnhancedSetterImpl( containerClass, propertyName, resolveMethod() );
+			return new EnhancedSetterMethodImpl( containerClass, propertyName, resolveMethod() );
 		}
 
 		@SuppressWarnings("unchecked")
