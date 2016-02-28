@@ -27,6 +27,7 @@ import org.hibernate.test.bytecode.enhancement.lazy.LazyBasicFieldNotInitialized
 import org.hibernate.test.bytecode.enhancement.lazy.LazyCollectionLoadingTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingIntegrationTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingTestTask;
+import org.hibernate.test.bytecode.enhancement.lazy.basic.HHH10533TestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.basic.LazyBasicFieldAccessTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.basic.LazyBasicPropertyAccessTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.group.LazyGroupAccessTestTask;
@@ -73,6 +74,12 @@ public class EnhancerTest extends BaseUnitTestCase {
 
 		EnhancerTestUtils.runEnhancerTestTask( LazyBasicPropertyAccessTestTask.class );
 		EnhancerTestUtils.runEnhancerTestTask( LazyBasicFieldAccessTestTask.class );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HHH-10533" )
+	public void testMixedPropertyAccess() {
+		EnhancerTestUtils.runEnhancerTestTask( HHH10533TestTask.class );
 	}
 
 	@Test
