@@ -39,6 +39,7 @@ import javassist.CtField;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -220,7 +221,7 @@ public class MavenEnhancePlugin extends AbstractMojo implements EnhancementConte
 
 	@Override
 	public boolean isEntityClass(CtClass classDescriptor) {
-        return classDescriptor.hasAnnotation(Entity.class);
+        return classDescriptor.hasAnnotation(Entity.class) || classDescriptor.hasAnnotation(MappedSuperclass.class);
     }
 
 	@Override
