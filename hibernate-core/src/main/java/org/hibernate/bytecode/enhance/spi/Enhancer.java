@@ -57,6 +57,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
@@ -389,6 +390,17 @@ public class Enhancer  {
 			}
 		}
 
+		// HHH-10646 Add fields inherited from @MappedSuperclass
+		// CtClass.getFields() does not return private fields, while CtClass.getDeclaredFields() does not return inherit
+		for ( CtField ctField : managedCtClass.getFields() ) {
+			if ( !ctField.getDeclaringClass().hasAnnotation( MappedSuperclass.class ) || Modifier.isStatic( ctField.getModifiers() ) ) {
+				continue;
+			}
+			if ( enhancementContext.isPersistentField( ctField ) ) {
+				persistentFieldList.add( ctField );
+			}
+		}
+
 		return enhancementContext.order( persistentFieldList.toArray( new CtField[persistentFieldList.size()]) );
 	}
 
@@ -414,6 +426,22 @@ public class Enhancer  {
                     }
                 }
             }
+
+			// HHH-10646 Add fields inherited from @MappedSuperclass
+			// CtClass.getFields() does not return private fields, while CtClass.getDeclaredFields() does not return inherit
+			for ( CtField ctField : managedCtClass.getFields() ) {
+				if ( !ctField.getDeclaringClass().hasAnnotation( MappedSuperclass.class ) || Modifier.isStatic( ctField.getModifiers() ) ) {
+					continue;
+				}
+				if ( enhancementContext.isPersistentField( ctField ) ) {
+					for(CtClass ctClass : ctField.getType().getInterfaces()) {
+						if(ctClass.getName().equals("java.util.Collection")) {
+							collectionList.add(ctField);
+							break;
+						}
+					}
+				}
+			}
         }
         catch (NotFoundException ignored) {  }
 
