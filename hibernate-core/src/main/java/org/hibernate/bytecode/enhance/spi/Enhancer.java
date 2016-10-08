@@ -11,11 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.LoaderClassPath;
 
+import javassist.NotFoundException;
 import org.hibernate.HibernateException;
 import org.hibernate.bytecode.enhance.internal.CompositeEnhancer;
 import org.hibernate.bytecode.enhance.internal.EntityEnhancer;
@@ -150,10 +152,21 @@ public class Enhancer {
 		if ( !PersistentAttributesHelper.isAssignable( managedCtClass, Managed.class.getName() ) ) {
 			return false;
 		}
-		// HHH-10977 - When a mapped superclass gets enhanced before a subclassing entity, the entity does not get enhanced, but it implements the Managed interface
-		return enhancementContext.isEntityClass( managedCtClass ) && PersistentAttributesHelper.isAssignable( managedCtClass, ManagedEntity.class.getName() )
-				|| enhancementContext.isCompositeClass( managedCtClass ) && PersistentAttributesHelper.isAssignable( managedCtClass, ManagedComposite.class.getName() )
-				|| enhancementContext.isMappedSuperclassClass( managedCtClass ) && PersistentAttributesHelper.isAssignable( managedCtClass, ManagedMappedSuperclass.class.getName() );
+		else {
+			// HHH-10977 - When a mapped superclass gets enhanced before a subclassing entity, the entity does not get enhanced, but it implements the Managed interface
+			// HHH-11156 - An entity class is not enhanced when superclass is enhanced before
+			try {
+				for ( CtClass declaredInterface : managedCtClass.getInterfaces() ) {
+					if ( PersistentAttributesHelper.isAssignable( declaredInterface, Managed.class.getName() ) ) {
+						return true;
+					}
+				}
+			}
+			catch ( NotFoundException nfe ) {
+				return false;
+			}
+			return false;
+		}
 	}
 
 	private byte[] getByteCode(CtClass managedCtClass) {

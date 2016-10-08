@@ -7,20 +7,14 @@
 package org.hibernate.test.bytecode.enhancement;
 
 import javassist.CtClass;
-
-import org.hibernate.test.bytecode.enhancement.association.InheritedAttributeAssociationTestTask;
-import org.hibernate.test.bytecode.enhancement.otherentityentrycontext.OtherEntityEntryContextTestTask;
-import org.hibernate.testing.FailureExpected;
-import org.hibernate.testing.TestForIssue;
-import org.hibernate.testing.bytecode.enhancement.EnhancerTestContext;
-import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
-import org.hibernate.testing.junit4.BaseUnitTestCase;
 import org.hibernate.test.bytecode.enhancement.access.MixedAccessTestTask;
+import org.hibernate.test.bytecode.enhancement.association.InheritedAttributeAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.ManyToManyAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.OneToManyAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.OneToOneAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.basic.BasicEnhancementTestTask;
 import org.hibernate.test.bytecode.enhancement.basic.HHH9529TestTask;
+import org.hibernate.test.bytecode.enhancement.basic.SuperclassEnhancementTestTask;
 import org.hibernate.test.bytecode.enhancement.cascade.CascadeDeleteTestTask;
 import org.hibernate.test.bytecode.enhancement.dirty.DirtyTrackingTestTask;
 import org.hibernate.test.bytecode.enhancement.eviction.EvictionTestTask;
@@ -48,7 +42,13 @@ import org.hibernate.test.bytecode.enhancement.merge.CompositeMergeTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyCollectionWithClearedSessionTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyCollectionWithClosedSessionTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyEntityLoadingWithClosedSessionTestTask;
+import org.hibernate.test.bytecode.enhancement.otherentityentrycontext.OtherEntityEntryContextTestTask;
 import org.hibernate.test.bytecode.enhancement.pk.EmbeddedPKTestTask;
+import org.hibernate.testing.FailureExpected;
+import org.hibernate.testing.TestForIssue;
+import org.hibernate.testing.bytecode.enhancement.EnhancerTestContext;
+import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
+import org.hibernate.testing.junit4.BaseUnitTestCase;
 import org.junit.Test;
 
 /**
@@ -59,6 +59,12 @@ public class EnhancerTest extends BaseUnitTestCase {
 	@Test
 	public void testBasic() {
 		EnhancerTestUtils.runEnhancerTestTask( BasicEnhancementTestTask.class );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HHH-11156" )
+	public void testBasicSuperclass() {
+		EnhancerTestUtils.runEnhancerTestTask( SuperclassEnhancementTestTask.class );
 	}
 
 	@Test
