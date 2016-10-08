@@ -7,15 +7,8 @@
 package org.hibernate.test.bytecode.enhancement;
 
 import javassist.CtClass;
-
-import org.hibernate.test.bytecode.enhancement.association.InheritedAttributeAssociationTestTask;
-import org.hibernate.test.bytecode.enhancement.otherentityentrycontext.OtherEntityEntryContextTestTask;
-import org.hibernate.testing.FailureExpected;
-import org.hibernate.testing.TestForIssue;
-import org.hibernate.testing.bytecode.enhancement.EnhancerTestContext;
-import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
-import org.hibernate.testing.junit4.BaseUnitTestCase;
 import org.hibernate.test.bytecode.enhancement.access.MixedAccessTestTask;
+import org.hibernate.test.bytecode.enhancement.association.InheritedAttributeAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.ManyToManyAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.OneToManyAssociationTestTask;
 import org.hibernate.test.bytecode.enhancement.association.OneToOneAssociationTestTask;
@@ -39,6 +32,7 @@ import org.hibernate.test.bytecode.enhancement.lazy.LazyCollectionNoTransactionL
 import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingIntegrationTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.LazyLoadingTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.LazyProxyOnEnhancedEntityTestTask;
+import org.hibernate.test.bytecode.enhancement.lazy.MultipleLazyCollectionTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.basic.LazyBasicFieldAccessTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.basic.LazyBasicPropertyAccessTestTask;
 import org.hibernate.test.bytecode.enhancement.lazy.group.LazyGroupAccessTestTask;
@@ -48,7 +42,13 @@ import org.hibernate.test.bytecode.enhancement.merge.CompositeMergeTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyCollectionWithClearedSessionTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyCollectionWithClosedSessionTestTask;
 import org.hibernate.test.bytecode.enhancement.ondemandload.LazyEntityLoadingWithClosedSessionTestTask;
+import org.hibernate.test.bytecode.enhancement.otherentityentrycontext.OtherEntityEntryContextTestTask;
 import org.hibernate.test.bytecode.enhancement.pk.EmbeddedPKTestTask;
+import org.hibernate.testing.FailureExpected;
+import org.hibernate.testing.TestForIssue;
+import org.hibernate.testing.bytecode.enhancement.EnhancerTestContext;
+import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
+import org.hibernate.testing.junit4.BaseUnitTestCase;
 import org.junit.Test;
 
 /**
@@ -137,6 +137,12 @@ public class EnhancerTest extends BaseUnitTestCase {
 	@Test
 	public void testLazyCollectionNoTransactionHandling() {
 		EnhancerTestUtils.runEnhancerTestTask( LazyCollectionNoTransactionLoadingTestTask.class );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HHH-11155" )
+	public void testMultipleLazyCollection() {
+		EnhancerTestUtils.runEnhancerTestTask( MultipleLazyCollectionTestTask.class );
 	}
 
 	@Test(timeout = 10000)
