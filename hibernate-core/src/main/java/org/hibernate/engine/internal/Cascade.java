@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.hibernate.HibernateException;
+import org.hibernate.bytecode.enhance.spi.LazyPropertyInitializer;
 import org.hibernate.bytecode.enhance.spi.interceptor.LazyAttributeLoadingInterceptor;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.CascadeStyle;
@@ -92,10 +93,9 @@ public final class Cascade {
 				if ( style.doCascade( action ) ) {
 					Object child;
 
-					// For bytecode enhanced entities, need to fetch the attribute
+					// For bytecode enhanced entities, need to add a reference to the attribute
 					if ( hasUninitializedLazyProperties && persister.getPropertyLaziness()[i] && action.performOnLazyProperty() ) {
-						LazyAttributeLoadingInterceptor interceptor = persister.getInstrumentationMetadata().extractInterceptor( parent );
-						child = interceptor.fetchAttribute( parent, propertyName );
+						child = types[i].resolve( null, eventSource, parent );
 					}
 					else {
 						child = persister.getPropertyValue( parent, i );
