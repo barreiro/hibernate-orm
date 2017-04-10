@@ -68,4 +68,8 @@ public final class SimpleFieldTracker implements DirtyTracker {
 		this.suspended = suspend;
 	}
 
+	@Override
+	public boolean isSuspended() {
+		return suspended;
+	}
 }

@@ -24,4 +24,6 @@ public interface DirtyTracker {
 	String[] get();
 
 	void suspend(boolean suspend);
+
+	boolean isSuspended();
 }

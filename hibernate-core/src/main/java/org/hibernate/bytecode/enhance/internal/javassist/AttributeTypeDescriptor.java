@@ -66,7 +66,9 @@ public abstract class AttributeTypeDescriptor {
 				}
 				builder.append(
 						String.format(
-								"  if ( !%s.areEqual( %s, $1 ) )",
+								"  if ( ( %s == null || !%s.isSuspended() ) && !%s.areEqual( %s, $1 ) )",
+								EnhancerConstants.TRACKER_FIELD_NAME,
+								EnhancerConstants.TRACKER_FIELD_NAME,
 								EqualsHelper.class.getName(),
 								readFragment
 						)

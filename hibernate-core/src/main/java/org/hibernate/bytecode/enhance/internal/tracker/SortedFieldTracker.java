@@ -94,4 +94,8 @@ public final class SortedFieldTracker implements DirtyTracker {
 		this.suspended = suspend;
 	}
 
+	@Override
+	public boolean isSuspended() {
+		return suspended;
+	}
 }
