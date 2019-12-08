@@ -133,7 +133,7 @@ public class MappedSuperclassWithEmbeddableTest extends BaseNonConfigCoreFunctio
 		}
 	}
 
-	@Entity
+	@Entity(name = "TestEntity")
 	public static class TestEntity extends BaseEntity {
 		@Id
 		private String id;
